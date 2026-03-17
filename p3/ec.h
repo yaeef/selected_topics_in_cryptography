@@ -15,6 +15,25 @@
 #define ENTROPY_POOL "/dev/urandom"
 
 /*
+ * Estructura de contexto que busca
+ * reducir las solicitudes de memoria
+ * dinamica.*/
+
+typedef struct
+{
+  mpz_t temp0;
+  mpz_t temp1;
+  mpz_t temp2;
+  mpz_t temp3;
+  mpz_t temp4;
+  mpz_t temp5;
+  mpz_t temp6;
+  mpz_t temp7;
+  mpz_t temp8;
+  mpz_t temp9;
+}CTX;
+
+/*
  * Estructura para puntos
  * */
 typedef struct
@@ -31,7 +50,8 @@ typedef struct
 }EC;
 
 /*
- * Estructura de contexto para memoria dinámica
+ * Estructura contexto que contendra memoria dinámica 
+ * para reducir las solicitudes de memoria dinámica
  * */
 typedef struct
 {
@@ -39,6 +59,14 @@ typedef struct
   EC ec_ctx;
   mpz_t num, den, inv_den, lambda, x3, y3;
 }ctx;
+
+
+/*
+ * Funciones de manejo de
+ * la estructura de contexto.
+ * */
+void init_ctx(CTX*);
+void del_ctx(CTX*);
 
 /*
  * Funciones para puntos
@@ -61,21 +89,22 @@ void init_ec(EC*);
 int set_ec(mpz_t , mpz_t , mpz_t , EC*);
 int set_ec_ui(unsigned int , unsigned int , unsigned int , EC*);
 void print_ec(EC);
-int is_singular_ec(EC);
+int is_singular_ec(EC, CTX*);                                   //CTX
 void del_ec(EC*);
 
 /*
  * Función  que verifica si un punto pertenece a una curva
  * */
-int is_on_curve(Point*, EC*);
+int is_on_curve(Point*, EC*, CTX*);                             //CTX
 
 /*
  * Operación de grupo
  * */
 
-int add_point(Point*, Point*, Point*, EC*);
-int double_point(Point*, Point*, EC*);
-void scalar_multiply(Point* , Point* , mpz_t , EC*);
+int add_point(Point*, Point*, Point*, EC*, CTX*);               //CTX
+int double_point(Point*, Point*, EC*, CTX*);                          //CTX
+void scalar_multiply_ltor(Point* , Point*, mpz_t, EC*, CTX*);      //CTX
+void scalar_multiply_rtol(Point* , Point*, mpz_t, EC*, CTX*);
 
 
 #endif
